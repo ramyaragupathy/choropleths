@@ -1,0 +1,145 @@
+
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="//d3js.org/topojson.v1.min.js"></script>
+        <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+         <link rel="stylesheet" type="text/css" href="choropleth.css">
+    <style>
+   
+    </style>
+
+</head>
+
+<body>
+<script>
+
+    var width = 800,
+        height =800;
+
+    var svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    var districts = svg.append("g")
+    .attr("id", "districts")
+    .attr("class", "Blues");
+ 
+    var projection = d3.geo.mercator()
+        .scale(600) // scales the map
+        .translate([width / 40	, height / 2]); // centers in SVG
+
+    var path = d3.geo.path()
+        .projection(projection);
+
+    var india = d3.json("./shapefiles/districts.geojson", function(json) { 
+    
+    var center = d3.geo.centroid(json)
+      var scale  = 150;
+      var offset = [width/2, height/2];
+      var projection = d3.geo.mercator().scale(scale).center(center)
+          .translate(offset);
+
+      // create the path
+      var path = d3.geo.path().projection(projection);
+
+      // using the path determine the bounds of the current map and use 
+      // these to determine better values for the scale and translation
+      var bounds  = path.bounds(json);
+      var hscale  = scale*width  / (bounds[1][0] - bounds[0][0]);
+      var vscale  = scale*height / (bounds[1][1] - bounds[0][1]);
+      var scale   = (hscale < vscale) ? hscale : vscale;
+      var offset  = [width - (bounds[0][0] + bounds[1][0])/2,
+                        height - (bounds[0][1] + bounds[1][1])/2];
+
+      // new projection
+      projection = d3.geo.mercator().center(center)
+        .scale(scale).translate(offset);
+      path = path.projection(projection);
+
+      // add a rectangle to see the bound of the svg
+      svg.append("rect").attr('width', width).attr('height', height)
+        .style('stroke', 'black').style('fill', 'none');
+
+      svg.selectAll("path").data(json.features).enter().append("path")
+        .attr("d", path)
+         .attr("class", function(d){
+          return d.properties.NAME_2;
+          
+        })
+        .style("fill","red")
+        .style("stroke-width", "1")
+        .style("stroke", "black");
+
+       for(var i=0;i<json.features.length; i++){
+        //   //write a d3 method to select the district using classname. here the classname is your json.features.properties/NAME_2
+        console.log(json.features[i].properties.NAME_2);
+          d3.select('.'+json.features[i].properties.NAME_2+'').style("fill", '#' + Math.floor(Math.random()*16777215).toString(16)+'');
+          
+        }
+
+});
+
+// d3.json("./shapefiles/districts.geojson", function(data) {
+    
+//     for (var i = 0; i < resources.length; i++) {
+//         var obj = resources[i]
+//         for (var key in obj) {
+//             console.log(key+"="+obj[key]);
+//         }   
+//     }   
+// });
+ 
+ var districtRainfallJSON = {};       
+
+ d3.csv("./shapefiles/1901.csv", function(data) {
+  //  console.log("data " + data.length)
+  // for(var i=0; i<json.features.length;i++){
+
+    data.forEach(function(d){
+  
+       // d.Rainfall = +d.Rainfall;
+       districtRainfallJSON[d.ID] = +d.Rainfall;
+
+    });
+
+  //console.log(JSON.stringify(districtRainfallJSON));
+ 
+ });
+
+
+                
+      // json.features[i].properties.NAME_2;
+      
+      
+
+    // });
+
+
+
+
+/*
+d3.json(data, function(json) {
+  
+
+  districts.selectAll("path")
+      .attr("class", quantize;
+});
+ 
+// quantize function takes a data point and returns a number
+// between 0 and 8, to indicate intensity, then prepends a 'q'
+// and appends '-9'
+function quantize(d) {
+  console.log(d);
+  return "q" + Math.min(8, ~~(data[d.Annual.Rainfall] * 9 / 12)) + "-9";
+}
+*/
+
+
+</script>
+</body>
+</html>
